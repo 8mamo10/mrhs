@@ -18,14 +18,14 @@
   - Profile Name: `mrhs`
   - Profile Type: `MQTT Broker`
   - Broker Address: `io.adafruit.com`
-  - Broken Port: `8883`
+  - Broker Port: `8883`
   - Client ID: `MQTT_FX_Client` (anything is ok)
   - User Credentials
-    - User Name: [Username] of adafruit
-    - Password: [Active Key] of adafruit
-      - Can get from Afafruit IO Key
+    - User Name: `[Username] of adafruit`
+    - Password: `[Active Key] of adafruit`
+      - Can get from Afafruit IO Key screen
   - SSL/TLS
-    - Check Enable SSL/TLS
+    - Check `Enable SSL/TLS`
     - Protocol: `TLSv1.2`
 - Connect
 - Publish
@@ -35,6 +35,9 @@
   - Input topic: `[Username]/feeds/mrhs`
   - Push `Subscribe`
 
-# references
+# M5Stack
+- https://github.com/8mamo10/m5stack
+
+# References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
