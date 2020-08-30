@@ -2,7 +2,7 @@
 - Monitoring Running Hangout Status
 - M5Stack + MQTT
 
-# MQTT broker
+## MQTT broker
 - Using io.adafruit this time.
 - Sign up to https://io.adafruit.com/
 - Create Feeds `mrhs`
@@ -10,7 +10,7 @@
 - Create Dashboard `mrhs`
   - https://io.adafruit.com/[Username]/dashboards/mrhs
 
-# MQTT client
+## MQTT client
 - Using MQTT.fx
   - http://mqttfx.jensd.de/
 - Download and install it
@@ -35,9 +35,9 @@
   - Input topic: `[Username]/feeds/mrhs`
   - Push `Subscribe`
 
-# M5Stack
+## M5Stack
 - https://github.com/8mamo10/m5stack
 
-# References
+## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
