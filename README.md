@@ -38,6 +38,10 @@
 ## M5Stack
 - https://github.com/8mamo10/m5stack
 
+## Adafruit_ADXL343
+- Sketch -> Include Library -> Manage Libraries
+  - Adafruit_ADXL343
+
 ## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
