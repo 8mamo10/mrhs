@@ -44,4 +44,5 @@
 
 ## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
+- https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
