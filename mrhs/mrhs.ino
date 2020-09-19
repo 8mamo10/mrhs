@@ -1,6 +1,6 @@
 #include <M5Stack.h>
 #include <WiFi.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
 #include <string.h>
@@ -9,20 +9,21 @@
 #include "Adafruit_MQTT_Client.h"
 
 #define AIO_SERVER "io.adafruit.com"
-#define AIO_SERVERPORT 1883
+#define AIO_SERVERPORT 8883
 #define AIO_USERNAME "8mamo10"
 #define AIO_KEY "aio_xxxxxxxxxx"
 #define READ_TIMEOUT 5000
 
 // Wi-Fi
-const char* fname = "/wifi.csv";
+const char* fname = "/config.csv";
+
 File fp;
 char ssid[32];
 char pass[32];
 
 void SetwifiSD(const char *file){
   unsigned int cnt = 0;
-  char data[64];
+  char data[256];
   char *str;
 
   fp = SD.open(fname, FILE_READ);
@@ -41,12 +42,12 @@ void SetwifiSD(const char *file){
   str = strtok(NULL,"\r"); // CR
   strncpy(&pass[0], str, strlen(str));
 
-  M5.Lcd.printf("WIFI-SSID: %s\n",ssid);
-  M5.Lcd.printf("WIFI-PASS: %s\n",pass);
+  M5.Lcd.printf("SSID:%s\n",ssid);
+  M5.Lcd.printf("PASS:%s\n",pass);
   M5.Lcd.println("Connecting...");
 
-  Serial.printf("SSID = %s\n",ssid);
-  Serial.printf("PASS = %s\n",pass);
+  Serial.printf("SSID:%s\n",ssid);
+  Serial.printf("PASS:%s\n",pass);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -68,16 +69,70 @@ const char MQTT_USERNAME[] PROGMEM = AIO_USERNAME;
 const char MQTT_PASSWORD[] PROGMEM = AIO_KEY;
 const char MRHS_FEED[]     PROGMEM = AIO_USERNAME "/feeds/mrhs";
 
-//Adafruit_MQTT_Client mqtt(&ctx, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
-//Adafruit_MQTT_Subscribe onAirIndicator = Adafruit_MQTT_Subscribe(&mqtt, MRHS_FEED);
+WiFiClientSecure client;
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
+Adafruit_MQTT_Subscribe onAirIndicator = Adafruit_MQTT_Subscribe(&mqtt, MRHS_FEED);
 
 void setup() {
+  Serial.begin(115200);
   M5.begin();
+  M5.Lcd.clear(BLACK);
+  M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setTextSize(2);
 
   SetwifiSD(fname);
+
+  M5.Lcd.println(F("Ok"));
+
+  mqtt.subscribe(&onAirIndicator);
+
+  delay(2000);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  M5.update();
+
+  MQTT_connect();
+  Adafruit_MQTT_Subscribe *subscription;
+    while ((subscription = mqtt.readSubscription(READ_TIMEOUT))) {
+    if (subscription == &onAirIndicator) {
+      String lastread = String((char*)onAirIndicator.lastread);
+      lastread.trim();
+      if (lastread == "") {
+        continue;
+      }
+      if (lastread == "0") {
+        showOnAir(TFT_LIGHTGREY);
+      } else {
+        showOnAir(TFT_RED);
+      }
+    }
+  }
+}
+
+void showOnAir(uint16_t bgColor) {
+  M5.Lcd.fillScreen(bgColor);
+  M5.Lcd.setCursor(40, 90);
+  M5.Lcd.setTextSize(7);
+  M5.Lcd.println(F("ON AIR"));
+}
+
+void MQTT_connect() {
+  int8_t ret;
+  if (mqtt.connected()) {
+    return;
+  }
+
+  M5.Lcd.setTextSize(2);
+  //M5.Lcd.setCursor(0,0);
+  M5.Lcd.print(F("Connecting to MQTT... "));
+
+  while ((ret = mqtt.connect()) != 0) {
+    M5.Lcd.println(F(mqtt.connectErrorString(ret)));
+    M5.Lcd.println(F("Retrying MQTT connection in 5 seconds ..."));
+    mqtt.disconnect();
+    delay(5000);
+  }
+
+  M5.Lcd.println("MQTT connected!");
 }
