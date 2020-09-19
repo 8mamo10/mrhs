@@ -5,6 +5,16 @@
 #include <Preferences.h>
 #include <string.h>
 
+#include "Adafruit_MQTT.h"
+#include "Adafruit_MQTT_Client.h"
+
+#define AIO_SERVER "io.adafruit.com"
+#define AIO_SERVERPORT 1883
+#define AIO_USERNAME "8mamo10"
+#define AIO_KEY "aio_xxxxxxxxxx"
+#define READ_TIMEOUT 5000
+
+// Wi-Fi
 const char* fname = "/wifi.csv";
 File fp;
 char ssid[32];
@@ -24,11 +34,11 @@ void SetwifiSD(const char *file){
   Serial.print("\n");
 
   strtok(data,",");
-  str = strtok(NULL,"\r");
+  str = strtok(NULL,"\r"); // CR
   strncpy(&ssid[0], str, strlen(str));
 
   strtok(NULL,",");
-  str = strtok(NULL,"\r");
+  str = strtok(NULL,"\r"); // CR
   strncpy(&pass[0], str, strlen(str));
 
   M5.Lcd.printf("WIFI-SSID: %s\n",ssid);
@@ -51,6 +61,15 @@ void SetwifiSD(const char *file){
   Serial.println(WiFi.localIP());
   fp.close();
 }
+
+// adafruit
+const char MQTT_SERVER[]   PROGMEM = AIO_SERVER;
+const char MQTT_USERNAME[] PROGMEM = AIO_USERNAME;
+const char MQTT_PASSWORD[] PROGMEM = AIO_KEY;
+const char MRHS_FEED[]     PROGMEM = AIO_USERNAME "/feeds/mrhs";
+
+//Adafruit_MQTT_Client mqtt(&ctx, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
+//Adafruit_MQTT_Subscribe onAirIndicator = Adafruit_MQTT_Subscribe(&mqtt, MRHS_FEED);
 
 void setup() {
   M5.begin();
