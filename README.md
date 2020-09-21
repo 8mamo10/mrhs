@@ -72,7 +72,17 @@ $ mosquitto_pub -t test -m Hello -i PUB
 ```
 $ mosquitto_sub -d -h test.mosquitto.org -p 8883 -t "#" --tls-version tlsv1.2 --cafile mosquitto.org.crt
 ```
+```
+$ mosquitto_sub -d -h io.adafruit.com -p 1883 -t [user]/feeds/mrhs -u [user] -P [pass]
+```
+```
+$
+```
+$ mosquitto_pub -d -h io.adafruit.com -p 1883 -t [user]/feeds/mrhs -u [user] -P [pass] -m 1
+```
+
 ## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
+- https://io.adafruit.com/api/docs/mqtt.html#mqtt-connection-details
