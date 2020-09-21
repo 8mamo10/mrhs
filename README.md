@@ -42,6 +42,32 @@
 - Sketch -> Include Library -> Manage Libraries
   - Adafruit MQTT Library (vresion was 1.3.0 when I did)
 
+## mosquitto
+- https://mosquitto.org/
+- `brew install mosquitto`
+```
+$ /usr/local/sbin/mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
+1600654250: mosquitto version 1.6.12 starting
+1600654250: Config loaded from /usr/local/etc/mosquitto/mosquitto.conf.
+1600654250: Opening ipv6 listen socket on port 1883.
+1600654250: Opening ipv4 listen socket on port 1883.
+1600654250: mosquitto version 1.6.12 running
+1600654260: New connection from ::1 on port 1883.
+1600654260: New client connected from ::1 as SUB (p2, c1, k60).
+1600654278: New connection from ::1 on port 1883.
+1600654278: New client connected from ::1 as PUB (p2, c1, k60).
+1600654278: Client PUB disconnected.
+1600654282: Client SUB disconnected.
+^C1600654290: mosquitto version 1.6.12 terminating
+```
+```
+$ mosquitto_sub -t test -i SUB
+Hello
+```
+```
+$ mosquitto_pub -t test -m Hello -i PUB
+```
+
 ## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
