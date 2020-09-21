@@ -10,8 +10,8 @@
 
 #define AIO_SERVER "io.adafruit.com"
 #define AIO_SERVERPORT 8883
-#define AIO_USERNAME "8mamo10"
-#define AIO_KEY "aio_xxxxxxxxxx"
+#define AIO_USERNAME "xxxxxxxxxx"
+#define AIO_KEY "yyyyyyyyyy"
 #define READ_TIMEOUT 5000
 
 // Wi-Fi
@@ -87,6 +87,7 @@ void setup() {
   mqtt.subscribe(&onMeetingIndicator);
 
   delay(2000);
+  showOk();
 }
 
 void loop() {
@@ -101,7 +102,9 @@ void loop() {
       if (lastread == "") {
         continue;
       }
-      if (lastread == "0") {
+      // Two processes are already in use before the camera was actually used.
+      // (avconfere and google chrome)
+      if (lastread.toInt() <= 2) {
         showOk();
       } else {
         showNg();
@@ -143,16 +146,12 @@ void MQTT_connect() {
     return;
   }
 
-  M5.Lcd.setTextSize(2);
-  //M5.Lcd.setCursor(0,0);
-  M5.Lcd.print(F("Connecting to MQTT... "));
-
+  Serial.println(F("Connecting to MQTT... "));
   while ((ret = mqtt.connect()) != 0) {
-    M5.Lcd.println(F(mqtt.connectErrorString(ret)));
-    M5.Lcd.println(F("Retrying MQTT connection in 5 seconds ..."));
+    Serial.println(F(mqtt.connectErrorString(ret)));
+    Serial.println(F("Retrying MQTT connection in 5 seconds ..."));
     mqtt.disconnect();
     delay(5000);
   }
-
-  M5.Lcd.println("MQTT connected!");
+  Serial.println(F("MQTT connected!"));
 }
