@@ -19,7 +19,9 @@
   - Profile Type: `MQTT Broker`
   - Broker Address: `io.adafruit.com`
   - Broker Port: `8883`
-  - Client ID: `MQTT_FX_Client` (anything is ok)
+  - Client ID: `MQTT_FX_Client`
+    - Anything is ok
+    - Do `Generate` is also good
   - User Credentials
     - User Name: `[Username] of adafruit`
     - Password: `[Active Key] of adafruit`
@@ -67,7 +69,9 @@ Hello
 ```
 $ mosquitto_pub -t test -m Hello -i PUB
 ```
-
+```
+$ mosquitto_sub -d -h test.mosquitto.org -p 8883 -t "#" --tls-version tlsv1.2 --cafile mosquitto.org.crt
+```
 ## References
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
