@@ -95,6 +95,7 @@ $ mosquitto_pub -L mqtt://${username}:${key}@io.adafruit.com/${username}/feeds/m
 ```
 # Every minute
 *   * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
+
 # Every 5minutes
 */5 * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
 ```
