@@ -62,24 +62,28 @@ $ /usr/local/sbin/mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
 1600654282: Client SUB disconnected.
 ^C1600654290: mosquitto version 1.6.12 terminating
 ```
+
 ```
 $ mosquitto_sub -t test -i SUB
 Hello
 ```
+
 ```
 $ mosquitto_pub -t test -m Hello -i PUB
 ```
+
 ```
 $ mosquitto_sub -d -h test.mosquitto.org -p 8883 -t "#" --tls-version tlsv1.2 --cafile mosquitto.org.crt
 ```
+
 ```
 $ mosquitto_sub -d -h io.adafruit.com -p 1883 -t ${username}/feeds/mrhs -u ${username} -P ${key}
 ```
-```
-$
+
 ```
 $ mosquitto_pub -d -h io.adafruit.com -p 1883 -t ${username}/feeds/mrhs -u ${username} -P ${key} -m 1
 ```
+
 ```
 $ mosquitto_pub -L mqtt://${username}:${key}@io.adafruit.com/${username}/feeds/mrhs -s
 ```
@@ -87,6 +91,7 @@ $ mosquitto_pub -L mqtt://${username}:${key}@io.adafruit.com/${username}/feeds/m
 ## MRHS agent
 - Update `username` and `key` on `mrhs_agent.sh`
 - Set up cron at an appropriate frequency
+
 ```
 # Every minute
 *   * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
