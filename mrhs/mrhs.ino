@@ -20,6 +20,8 @@ const char* fname = "/config.csv";
 File fp;
 char ssid[32];
 char pass[32];
+char username[64];
+char key[64];
 
 void SetwifiSD(const char *file){
   unsigned int cnt = 0;
@@ -35,12 +37,20 @@ void SetwifiSD(const char *file){
   Serial.print("\n");
 
   strtok(data,",");
-  str = strtok(NULL,"\r"); // CR
+  str = strtok(NULL,"\r");
   strncpy(&ssid[0], str, strlen(str));
 
   strtok(NULL,",");
-  str = strtok(NULL,"\r"); // CR
+  str = strtok(NULL,"\r");
   strncpy(&pass[0], str, strlen(str));
+
+  strtok(NULL,",");
+  str = strtok(NULL,"\r");
+  strncpy(&username[0], str, strlen(str));
+
+  strtok(NULL,",");
+  str = strtok(NULL,"\r");
+  strncpy(&key[0], str, strlen(str));
 
   M5.Lcd.printf("SSID:%s\n",ssid);
   M5.Lcd.printf("PASS:%s\n",pass);
@@ -48,6 +58,8 @@ void SetwifiSD(const char *file){
 
   Serial.printf("SSID:%s\n",ssid);
   Serial.printf("PASS:%s\n",pass);
+  Serial.printf("USERNAME:%s\n",username);
+  Serial.printf("KEY:%s\n",key);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
