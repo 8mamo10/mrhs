@@ -10,18 +10,21 @@
 
 #define AIO_SERVER "io.adafruit.com"
 #define AIO_SERVERPORT 8883
-#define AIO_USERNAME "xxxxxxxxxx"
-#define AIO_KEY "yyyyyyyyyy"
 #define READ_TIMEOUT 5000
 
 // Wi-Fi
 const char* fname = "/config.csv";
 
+// config
 File fp;
 char ssid[32];
 char pass[32];
 char username[64];
 char key[64];
+
+
+// adafruit
+char feed[64];
 
 void SetwifiSD(const char *file){
   unsigned int cnt = 0;
@@ -53,14 +56,14 @@ void SetwifiSD(const char *file){
   str = strtok(NULL,"\r");
   strncpy(&key[0], str, strlen(str));
 
-  M5.Lcd.printf("SSID:%s\n",ssid);
-  M5.Lcd.printf("PASS:%s\n",pass);
+  M5.Lcd.printf("SSID:%s\n", ssid);
+  M5.Lcd.printf("PASS:%s\n", pass);
   M5.Lcd.println("Connecting...");
 
-  Serial.printf("SSID:%s\n",ssid);
-  Serial.printf("PASS:%s\n",pass);
-  Serial.printf("USERNAME:%s\n",username);
-  Serial.printf("KEY:%s\n",key);
+  Serial.printf("SSID:%s\n", ssid);
+  Serial.printf("PASS:%s\n", pass);
+  Serial.printf("USERNAME:%s\n", username);
+  Serial.printf("KEY:%s\n", key);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -68,6 +71,7 @@ void SetwifiSD(const char *file){
       delay(500);
       Serial.print(".");
   }
+  Serial.print("\n");
 
   M5.Lcd.print("IP: ");
   M5.Lcd.println(WiFi.localIP());
@@ -76,54 +80,9 @@ void SetwifiSD(const char *file){
   fp.close();
 }
 
-// adafruit
-const char MRHS_FEED[]     PROGMEM = AIO_USERNAME "/feeds/mrhs";
-
 WiFiClientSecure client;
 Adafruit_MQTT_Client *mqtt;
 Adafruit_MQTT_Subscribe *onMeetingIndicator;
-
-void setup() {
-  Serial.begin(115200);
-  M5.begin();
-  M5.Lcd.clear(BLACK);
-  M5.Lcd.setTextColor(WHITE);
-  M5.Lcd.setTextSize(2);
-
-  SetwifiSD(fname);
-
-  M5.Lcd.println(F("Ok"));
-
-  mqtt = new Adafruit_MQTT_Client(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
-  onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, MRHS_FEED);
-  mqtt->subscribe(onMeetingIndicator);
-
-  delay(2000);
-  showOk();
-}
-
-void loop() {
-  M5.update();
-
-  MQTT_connect();
-  Adafruit_MQTT_Subscribe *subscription;
-    while ((subscription = mqtt->readSubscription(READ_TIMEOUT))) {
-    if (subscription == onMeetingIndicator) {
-      String lastread = String((char*)onMeetingIndicator->lastread);
-      lastread.trim();
-      if (lastread == "") {
-        continue;
-      }
-      // Two processes are already in use before the camera was actually used.
-      // (avconfere and google chrome)
-      if (lastread.toInt() <= 2) {
-        showOk();
-      } else {
-        showNg();
-      }
-    }
-  }
-}
 
 void showOnMeeting(uint16_t bgColor) {
   M5.Lcd.fillScreen(bgColor);
@@ -166,4 +125,51 @@ void MQTT_connect() {
     delay(5000);
   }
   Serial.println(F("MQTT connected!"));
+}
+
+void setup() {
+  Serial.begin(115200);
+  M5.begin();
+  M5.Lcd.clear(BLACK);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+
+  SetwifiSD(fname);
+
+  M5.Lcd.println(F("Ok"));
+
+  mqtt = new Adafruit_MQTT_Client(&client, AIO_SERVER, AIO_SERVERPORT, username, username, key);
+  String mrhs_feed = String(username) + "/feeds/mrhs";
+  // mrhs_feed itself is not suitable because it exists on this stack, so store it to persistent char array.
+  memmove(feed, mrhs_feed.c_str(), mrhs_feed.length());
+
+  onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, feed);
+  onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, "8mamo10/feeds/mrhs");
+  mqtt->subscribe(onMeetingIndicator);
+
+  delay(2000);
+  showOk();
+}
+
+void loop() {
+  M5.update();
+
+  MQTT_connect();
+  Adafruit_MQTT_Subscribe *subscription;
+    while ((subscription = mqtt->readSubscription(READ_TIMEOUT))) {
+    if (subscription == onMeetingIndicator) {
+      String lastread = String((char*)onMeetingIndicator->lastread);
+      lastread.trim();
+      if (lastread == "") {
+        continue;
+      }
+      // Two processes are already in use before the camera was actually used.
+      // (avconfere and google chrome)
+      if (lastread.toInt() <= 2) {
+        showOk();
+      } else {
+        showNg();
+      }
+    }
+  }
 }
