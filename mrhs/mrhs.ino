@@ -32,9 +32,10 @@ void SetwifiSD(const char *file){
   while(fp.available()){
     data[cnt++] = fp.read();
   }
-  Serial.print("data: ");
+  Serial.print("data:");
+  Serial.print("\n-----\n");
   Serial.print(data);
-  Serial.print("\n");
+  Serial.print("\n-----\n");
 
   strtok(data,",");
   str = strtok(NULL,"\r");
@@ -76,14 +77,11 @@ void SetwifiSD(const char *file){
 }
 
 // adafruit
-const char MQTT_SERVER[]   PROGMEM = AIO_SERVER;
-const char MQTT_USERNAME[] PROGMEM = AIO_USERNAME;
-const char MQTT_PASSWORD[] PROGMEM = AIO_KEY;
 const char MRHS_FEED[]     PROGMEM = AIO_USERNAME "/feeds/mrhs";
 
 WiFiClientSecure client;
-Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
-Adafruit_MQTT_Subscribe onMeetingIndicator = Adafruit_MQTT_Subscribe(&mqtt, MRHS_FEED);
+Adafruit_MQTT_Client *mqtt;
+Adafruit_MQTT_Subscribe *onMeetingIndicator;
 
 void setup() {
   Serial.begin(115200);
@@ -96,7 +94,9 @@ void setup() {
 
   M5.Lcd.println(F("Ok"));
 
-  mqtt.subscribe(&onMeetingIndicator);
+  mqtt = new Adafruit_MQTT_Client(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
+  onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, MRHS_FEED);
+  mqtt->subscribe(onMeetingIndicator);
 
   delay(2000);
   showOk();
@@ -107,9 +107,9 @@ void loop() {
 
   MQTT_connect();
   Adafruit_MQTT_Subscribe *subscription;
-    while ((subscription = mqtt.readSubscription(READ_TIMEOUT))) {
-    if (subscription == &onMeetingIndicator) {
-      String lastread = String((char*)onMeetingIndicator.lastread);
+    while ((subscription = mqtt->readSubscription(READ_TIMEOUT))) {
+    if (subscription == onMeetingIndicator) {
+      String lastread = String((char*)onMeetingIndicator->lastread);
       lastread.trim();
       if (lastread == "") {
         continue;
@@ -154,15 +154,15 @@ void showNg() {
 
 void MQTT_connect() {
   int8_t ret;
-  if (mqtt.connected()) {
+  if (mqtt->connected()) {
     return;
   }
 
   Serial.println(F("Connecting to MQTT... "));
-  while ((ret = mqtt.connect()) != 0) {
-    Serial.println(F(mqtt.connectErrorString(ret)));
+  while ((ret = mqtt->connect()) != 0) {
+    Serial.println(F(mqtt->connectErrorString(ret)));
     Serial.println(F("Retrying MQTT connection in 5 seconds ..."));
-    mqtt.disconnect();
+    mqtt->disconnect();
     delay(5000);
   }
   Serial.println(F("MQTT connected!"));
