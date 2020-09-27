@@ -10,6 +10,7 @@
 
 #define AIO_SERVER "io.adafruit.com"
 #define AIO_SERVERPORT 8883
+#define AIO_FEEDS "/feeds/mrhs"
 #define READ_TIMEOUT 5000
 
 // Wi-Fi
@@ -21,7 +22,6 @@ char ssid[32];
 char pass[32];
 char username[64];
 char key[64];
-
 
 // adafruit
 char feed[64];
@@ -139,12 +139,11 @@ void setup() {
   M5.Lcd.println(F("Ok"));
 
   mqtt = new Adafruit_MQTT_Client(&client, AIO_SERVER, AIO_SERVERPORT, username, username, key);
-  String mrhs_feed = String(username) + "/feeds/mrhs";
-  // mrhs_feed itself is not suitable because it exists on this stack, so store it to persistent char array.
+  String mrhs_feed = String(username) + AIO_FEEDS;
+  // mrhs_feed itself is not suitable for passing to Adafruit_MQTT_Subscribe
+  // since it exists on this scope, so store it to persistent char array.
   memmove(feed, mrhs_feed.c_str(), mrhs_feed.length());
-
   onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, feed);
-  onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, "8mamo10/feeds/mrhs");
   mqtt->subscribe(onMeetingIndicator);
 
   delay(2000);
