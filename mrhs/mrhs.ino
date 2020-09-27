@@ -141,7 +141,7 @@ void setup() {
   mqtt = new Adafruit_MQTT_Client(&client, AIO_SERVER, AIO_SERVERPORT, username, username, key);
   String mrhs_feed = String(username) + AIO_FEEDS;
   // mrhs_feed itself is not suitable for passing to Adafruit_MQTT_Subscribe
-  // since it exists on this scope, so store it to persistent char array.
+  // since this instance exists on this scope, so store it to persistent char array.
   memmove(feed, mrhs_feed.c_str(), mrhs_feed.length());
   onMeetingIndicator = new Adafruit_MQTT_Subscribe(mqtt, feed);
   mqtt->subscribe(onMeetingIndicator);
