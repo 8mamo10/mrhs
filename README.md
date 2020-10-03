@@ -93,7 +93,7 @@ $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${use
 ```
 
 ## MRHS agent
-- Update `username` and `key` on `mrhs_agent.sh`
+- Update `username` and `key` on `script/.mrhs.json`
 - Set up cron at an appropriate frequency
 
 ```
