@@ -26,7 +26,7 @@ char key[64];
 // adafruit
 char feed[64];
 
-void SetwifiSD(const char *file){
+void SetupWifi(const char *file) {
   unsigned int cnt = 0;
   char data[256];
   char *str;
@@ -134,7 +134,7 @@ void setup() {
   M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setTextSize(2);
 
-  SetwifiSD(fname);
+  SetupWifi(fname);
 
   M5.Lcd.println(F("Ok"));
 
