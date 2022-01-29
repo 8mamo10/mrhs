@@ -26,6 +26,9 @@ char key[64];
 // adafruit
 char feed[64];
 
+// debug console
+String debugMsg;
+
 void SetupWifi(const char *file)
 {
   unsigned int cnt = 0;
@@ -62,25 +65,56 @@ void SetupWifi(const char *file)
   M5.Lcd.printf("PASS:%s\n", pass);
   M5.Lcd.println("Connecting...");
 
-  Serial.printf("SSID:%s\n", ssid);
-  Serial.printf("PASS:%s\n", pass);
-  Serial.printf("USERNAME:%s\n", username);
-  Serial.printf("KEY:%s\n", key);
+  //Serial.printf("SSID:%s\n", ssid);
+  //Serial.printf("PASS:%s\n", pass);
+  //Serial.printf("USERNAME:%s\n", username);
+  //Serial.printf("KEY:%s\n", key);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    Serial.print(".");
+    //Serial.print(".");
   }
-  Serial.print("\n");
+  //Serial.print("\n");
 
   M5.Lcd.print("IP: ");
   M5.Lcd.println(WiFi.localIP());
-  Serial.printf("IP: ");
-  Serial.println(WiFi.localIP());
+  //Serial.printf("IP: ");
+  //Serial.println(WiFi.localIP());
   fp.close();
+
+  debugMsg += "SSID:";
+  debugMsg += ssid;
+  debugMsg += "\n";
+  debugMsg += "PASS:";
+  debugMsg += pass;
+  debugMsg += "\n";
+  debugMsg += "IP:";
+  debugMsg += ipToString(WiFi.localIP());
+  debugMsg += "\n";
+  debugMsg += "USERNAME:";
+  debugMsg += username;
+  debugMsg += "\n";
+  debugMsg += "KEY:";
+  debugMsg += key;
+  debugMsg += "\n";
+  Serial.println(debugMsg);
+}
+
+String ipToString(uint32_t ip) {
+  String result = "";
+
+  result += String((ip & 0xFF), 10);
+  result += ".";
+  result += String((ip & 0xFF00) >> 8, 10);
+  result += ".";
+  result += String((ip & 0xFF0000) >> 16, 10);
+  result += ".";
+  result += String((ip & 0xFF000000) >> 24, 10);
+
+  return result;
 }
 
 WiFiClientSecure client;
@@ -189,4 +223,5 @@ void loop()
       }
     }
   }
+
 }
