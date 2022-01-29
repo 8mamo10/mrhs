@@ -31,13 +31,15 @@ String debugMsg;
 bool isDebug = false;
 bool isOk = true;
 
-void SetupWifi(const char *file) {
+void SetupWifi(const char *file)
+{
   unsigned int cnt = 0;
   char data[256];
   char *str;
 
   fp = SD.open(fname, FILE_READ);
-  while (fp.available()) {
+  while (fp.available())
+  {
     data[cnt++] = fp.read();
   }
   Serial.print("data:");
@@ -103,7 +105,8 @@ void SetupWifi(const char *file) {
   Serial.println(debugMsg);
 }
 
-String ipToString(uint32_t ip) {
+String ipToString(uint32_t ip)
+{
   String result = "";
 
   result += String((ip & 0xFF), 10);
@@ -129,19 +132,26 @@ void showOnMeeting(uint16_t bgColor)
   M5.Lcd.println(F("ON MEETING"));
 }
 
-void showOkOrNg() {
-  if (isOk) {
+void showOkOrNg()
+{
+  if (isOk)
+  {
     showOk();
-  } else {
+  }
+  else
+  {
     showNg();
   }
 }
 
 void showOk()
 {
-  if (isDebug) {
+  if (isDebug)
+  {
     showDebug();
-  } else {
+  }
+  else
+  {
     M5.Lcd.fillScreen(TFT_GREEN);
     // 320 * 240
     M5.Lcd.fillEllipse(160, 120, 100, 100, TFT_WHITE);
@@ -152,9 +162,12 @@ void showOk()
 
 void showNg()
 {
-  if (isDebug) {
+  if (isDebug)
+  {
     showDebug();
-  } else {
+  }
+  else
+  {
     M5.Lcd.fillScreen(TFT_RED);
     // 320 * 240
     //M5.Lcd.fillRect(60, 110, 200, 20, TFT_WHITE);
@@ -170,7 +183,8 @@ void showNg()
   isOk = false;
 }
 
-void showDebug() {
+void showDebug()
+{
   M5.Lcd.fillScreen(TFT_BLACK);
   M5.Lcd.setCursor(0, 0);
   M5.Lcd.println(F(debugMsg.c_str()));
@@ -225,10 +239,13 @@ void loop()
   MQTT_connect();
   Adafruit_MQTT_Subscribe *subscription;
 
-  if (M5.BtnA.isPressed()) {
+  if (M5.BtnA.isPressed())
+  {
     Serial.println("ButtonA pressed");
     isDebug = true;
-  } else if (M5.BtnB.isPressed()) {
+  }
+  else if (M5.BtnB.isPressed())
+  {
     Serial.println("ButtonB pressed");
     isDebug = false;
   }
