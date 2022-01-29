@@ -26,18 +26,18 @@ char key[64];
 // adafruit
 char feed[64];
 
-// debug console
+// for debug console
 String debugMsg;
+bool isDebug = false;
+bool isOk = true;
 
-void SetupWifi(const char *file)
-{
+void SetupWifi(const char *file) {
   unsigned int cnt = 0;
   char data[256];
   char *str;
 
   fp = SD.open(fname, FILE_READ);
-  while (fp.available())
-  {
+  while (fp.available()) {
     data[cnt++] = fp.read();
   }
   Serial.print("data:");
@@ -129,27 +129,51 @@ void showOnMeeting(uint16_t bgColor)
   M5.Lcd.println(F("ON MEETING"));
 }
 
+void showOkOrNg() {
+  if (isOk) {
+    showOk();
+  } else {
+    showNg();
+  }
+}
+
 void showOk()
 {
-  M5.Lcd.fillScreen(TFT_GREEN);
-  // 320 * 240
-  M5.Lcd.fillEllipse(160, 120, 100, 100, TFT_WHITE);
-  M5.Lcd.fillEllipse(160, 120, 75, 75, TFT_GREEN);
+  if (isDebug) {
+    showDebug();
+  } else {
+    M5.Lcd.fillScreen(TFT_GREEN);
+    // 320 * 240
+    M5.Lcd.fillEllipse(160, 120, 100, 100, TFT_WHITE);
+    M5.Lcd.fillEllipse(160, 120, 75, 75, TFT_GREEN);
+  }
+  isOk = true;
 }
 
 void showNg()
 {
-  M5.Lcd.fillScreen(TFT_RED);
-  // 320 * 240
-  //M5.Lcd.fillRect(60, 110, 200, 20, TFT_WHITE);
-  //M5.Lcd.fillRect(150, 20, 20, 200, TFT_WHITE);
-  for (int i = 0; i <= 10; i++)
-  {
-    M5.Lcd.drawLine(60 + i, 20 - i, 260 + i, 220 - i, TFT_WHITE);
-    M5.Lcd.drawLine(60 - i, 20 + i, 260 - i, 220 + i, TFT_WHITE);
-    M5.Lcd.drawLine(60 + i, 220 + i, 260 + i, 20 + i, TFT_WHITE);
-    M5.Lcd.drawLine(60 - i, 220 - i, 260 - i, 20 - i, TFT_WHITE);
+  if (isDebug) {
+    showDebug();
+  } else {
+    M5.Lcd.fillScreen(TFT_RED);
+    // 320 * 240
+    //M5.Lcd.fillRect(60, 110, 200, 20, TFT_WHITE);
+    //M5.Lcd.fillRect(150, 20, 20, 200, TFT_WHITE);
+    for (int i = 0; i <= 10; i++)
+    {
+      M5.Lcd.drawLine(60 + i, 20 - i, 260 + i, 220 - i, TFT_WHITE);
+      M5.Lcd.drawLine(60 - i, 20 + i, 260 - i, 220 + i, TFT_WHITE);
+      M5.Lcd.drawLine(60 + i, 220 + i, 260 + i, 20 + i, TFT_WHITE);
+      M5.Lcd.drawLine(60 - i, 220 - i, 260 - i, 20 - i, TFT_WHITE);
+    }
   }
+  isOk = false;
+}
+
+void showDebug() {
+  M5.Lcd.fillScreen(TFT_BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.println(F(debugMsg.c_str()));
 }
 
 void MQTT_connect()
@@ -198,14 +222,27 @@ void setup()
 void loop()
 {
   M5.update();
-
   MQTT_connect();
   Adafruit_MQTT_Subscribe *subscription;
+
+  if (M5.BtnA.isPressed()) {
+    Serial.println("ButtonA pressed");
+    isDebug = true;
+  } else if (M5.BtnB.isPressed()) {
+    Serial.println("ButtonB pressed");
+    isDebug = false;
+  }
+
+  showOkOrNg();
+
+  // loop until here without MQTT update
+
   while ((subscription = mqtt->readSubscription(READ_TIMEOUT)))
   {
     if (subscription == onMeetingIndicator)
     {
       String lastread = String((char *)onMeetingIndicator->lastread);
+      Serial.printf("MQTT:%s\n", lastread.c_str());
       lastread.trim();
       if (lastread == "")
       {
@@ -223,5 +260,4 @@ void loop()
       }
     }
   }
-
 }
