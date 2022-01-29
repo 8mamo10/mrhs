@@ -259,8 +259,8 @@ void loop()
     if (subscription == onMeetingIndicator)
     {
       String lastread = String((char *)onMeetingIndicator->lastread);
-      Serial.printf("MQTT:%s\n", lastread.c_str());
       lastread.trim();
+      Serial.printf("MQTT:%s\n", lastread.c_str());
       if (lastread == "")
       {
         continue;
@@ -269,12 +269,13 @@ void loop()
       // (avconfere and google chrome)
       if (lastread.toInt() <= 2)
       {
-        showOk();
+        isOk = true;
       }
       else
       {
-        showNg();
+        isOk = false;
       }
+      showOkOrNg();
     }
   }
 }
