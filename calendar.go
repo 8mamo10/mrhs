@@ -46,6 +46,7 @@ func main() {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
 	t := time.Now().Format(time.RFC3339)
+	fmt.Println("Now: ", t)
 	events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
 		SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
 	if err != nil {
@@ -60,7 +61,7 @@ func main() {
 			if date == "" {
 				date = item.Start.Date
 			}
-			fmt.Printf("%v (%v)\n", item.Summary, date)
+			fmt.Printf("%v,%v\n", date, item.Summary)
 		}
 	}
 }
