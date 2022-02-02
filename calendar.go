@@ -47,8 +47,16 @@ func main() {
 	}
 	t := time.Now().Format(time.RFC3339)
 	fmt.Println("Now: ", t)
+	/*
+		events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
+			SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
+	*/
+	from := time.Now().Format(time.RFC3339)
+	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
+	fmt.Printf("Duration: %v - %v\n", from, to)
 	events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
-		SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
+		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
+
 	if err != nil {
 		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
 	}
