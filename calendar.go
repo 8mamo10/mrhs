@@ -69,6 +69,10 @@ func main() {
 		if date == "" {
 			date = item.Start.Date
 		}
-		fmt.Printf("%v,%v\n", date, item.Summary)
+		summary := item.Summary
+		if summary != "" {
+			summary = "MEETING"
+		}
+		fmt.Printf("%v,%v\n", date, summary)
 	}
 }
