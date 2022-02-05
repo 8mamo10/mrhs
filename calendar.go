@@ -19,6 +19,17 @@ var defaultConfig = config{
 	CalendarID: "primary",
 }
 
+type Schedule struct {
+	StartDateTime time.Time
+	EndDateTime   time.Time
+	Summary       string
+}
+
+type ScheduleList struct {
+	Schedules []Schedule
+	UpdatedAt time.Time
+}
+
 func getConfig(path string) (config, error) {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -38,22 +49,23 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to get config. err: %v", err)
 	}
-	fmt.Println("CalenderId: ", c.CalendarID)
+	fmt.Printf("CalenderId:%s\n", c.CalendarID)
 
 	ctx := context.Background()
 	srv, err := calendar.NewService(ctx)
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
+
 	t := time.Now().Format(time.RFC3339)
-	fmt.Println("Now: ", t)
+	fmt.Printf("Now:%v\n", t)
 	/*
 		events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
 			SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
 	*/
 	from := time.Now().Format(time.RFC3339)
 	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
-	fmt.Printf("Duration: %v - %v\n", from, to)
+	fmt.Printf("Duration:%v - %v\n", from, to)
 	events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
 		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
 
@@ -65,14 +77,20 @@ func main() {
 	}
 	fmt.Println("Upcoming events:")
 	for _, item := range events.Items {
-		date := item.Start.DateTime
-		if date == "" {
-			date = item.Start.Date
+		startDateTime, err := time.Parse(time.RFC3339, item.Start.DateTime)
+		if err != nil {
+			continue
+		}
+		endDateTime, err := time.Parse(time.RFC3339, item.End.DateTime)
+		if err != nil {
+			continue
 		}
 		summary := item.Summary
-		if summary != "" {
-			summary = "MEETING"
+		s := Schedule{
+			StartDateTime: startDateTime,
+			EndDateTime:   endDateTime,
+			Summary:       summary,
 		}
-		fmt.Printf("%v,%v\n", date, summary)
+		fmt.Printf("%v,%v,%v\n", s.StartDateTime, s.EndDateTime, s.Summary)
 	}
 }
