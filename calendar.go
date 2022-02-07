@@ -54,7 +54,7 @@ func main() {
 	ctx := context.Background()
 	srv, err := calendar.NewService(ctx)
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		log.Fatalf("Unable to retrieve calendar client. err: %v", err)
 	}
 
 	t := time.Now().Format(time.RFC3339)
