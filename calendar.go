@@ -19,15 +19,21 @@ var defaultConfig = config{
 	CalendarID: "primary",
 }
 
-type Schedule struct {
+type schedule struct {
 	StartDateTime time.Time
 	EndDateTime   time.Time
 	Summary       string
 }
 
-type ScheduleList struct {
-	Schedules []Schedule
+type scheduleList struct {
+	Schedules []schedule
 	UpdatedAt time.Time
+}
+
+func (s *scheduleList) dump() {
+	for _, schedule := range s.Schedules {
+		fmt.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
+	}
 }
 
 func getConfig(path string) (config, error) {
@@ -43,38 +49,29 @@ func getConfig(path string) (config, error) {
 	return c, nil
 }
 
-func main() {
-	const configPath = "./.calendar.json"
-	c, err := getConfig(configPath)
-	if err != nil {
-		log.Fatalf("Failed to get config. err: %v", err)
-	}
-	fmt.Printf("CalenderId:%s\n", c.CalendarID)
-
+func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 	ctx := context.Background()
 	srv, err := calendar.NewService(ctx)
 	if err != nil {
-		log.Fatalf("Unable to retrieve calendar client. err: %v", err)
+		return scheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
 	}
 
 	t := time.Now().Format(time.RFC3339)
 	fmt.Printf("Now:%v\n", t)
-	/*
-		events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
-			SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
-	*/
 	from := time.Now().Format(time.RFC3339)
 	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
 	fmt.Printf("Duration:%v - %v\n", from, to)
-	events, err := srv.Events.List(c.CalendarID).ShowDeleted(false).
-		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
 
+	events, err := srv.Events.List(calendarId).ShowDeleted(false).
+		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
+		return scheduleList{}, fmt.Errorf("unable to retrieve next events: %v", err)
 	}
 	if len(events.Items) == 0 {
-		log.Fatal("No upcoming events found")
+		return scheduleList{}, fmt.Errorf("no upcoming events found")
 	}
+
+	scheduleList := scheduleList{}
 	fmt.Println("Upcoming events:")
 	for _, item := range events.Items {
 		startDateTime, err := time.Parse(time.RFC3339, item.Start.DateTime)
@@ -86,11 +83,27 @@ func main() {
 			continue
 		}
 		summary := item.Summary
-		s := Schedule{
+		s := schedule{
 			StartDateTime: startDateTime,
 			EndDateTime:   endDateTime,
 			Summary:       summary,
 		}
-		fmt.Printf("%v,%v,%v\n", s.StartDateTime, s.EndDateTime, s.Summary)
+		scheduleList.Schedules = append(scheduleList.Schedules, s)
 	}
+	return scheduleList, nil
+}
+
+func main() {
+	const configPath = "./.calendar.json"
+	config, err := getConfig(configPath)
+	if err != nil {
+		log.Fatalf("Failed to get config. err: %v", err)
+	}
+	fmt.Printf("CalenderId:%s\n", config.CalendarID)
+
+	scheduleList, err := fetchNextOneDaySchedules(config.CalendarID)
+	if err != nil {
+		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+	}
+	scheduleList.dump()
 }
