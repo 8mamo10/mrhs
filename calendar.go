@@ -11,7 +11,9 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-const configPath = "./.calendar.json"
+const (
+	configPath = "./.calendar.json"
+)
 
 type config struct {
 	CalendarID string `json:"calendar_id"`
@@ -21,18 +23,18 @@ var defaultConfig = config{
 	CalendarID: "primary",
 }
 
-type schedule struct {
+type Schedule struct {
 	StartDateTime time.Time
 	EndDateTime   time.Time
 	Summary       string
 }
 
-type scheduleList struct {
-	Schedules []schedule
+type ScheduleList struct {
+	Schedules []Schedule
 	UpdatedAt time.Time
 }
 
-func (s *scheduleList) dump() {
+func (s *ScheduleList) dump() {
 	fmt.Printf("UpdatedAt:%v\n", s.UpdatedAt)
 	for _, schedule := range s.Schedules {
 		fmt.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
@@ -52,11 +54,11 @@ func getConfig(path string) (config, error) {
 	return c, nil
 }
 
-func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
+func fetchNextOneDaySchedules(calendarId string) (ScheduleList, error) {
 	ctx := context.Background()
 	srv, err := calendar.NewService(ctx)
 	if err != nil {
-		return scheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
+		return ScheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
 	}
 
 	from := time.Now().Format(time.RFC3339)
@@ -66,13 +68,13 @@ func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 	events, err := srv.Events.List(calendarId).ShowDeleted(false).
 		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
 	if err != nil {
-		return scheduleList{}, fmt.Errorf("unable to retrieve next events: %v", err)
+		return ScheduleList{}, fmt.Errorf("unable to retrieve next events: %v", err)
 	}
 	if len(events.Items) == 0 {
-		return scheduleList{}, fmt.Errorf("no upcoming events found")
+		return ScheduleList{}, fmt.Errorf("no upcoming events found")
 	}
 
-	scheduleList := scheduleList{}
+	scheduleList := ScheduleList{}
 	fmt.Println("Upcoming events:")
 	for _, item := range events.Items {
 		startDateTime, err := time.Parse(time.RFC3339, item.Start.DateTime)
@@ -84,7 +86,7 @@ func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 			continue
 		}
 		summary := item.Summary
-		s := schedule{
+		s := Schedule{
 			StartDateTime: startDateTime,
 			EndDateTime:   endDateTime,
 			Summary:       summary,
@@ -95,8 +97,25 @@ func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 	return scheduleList, nil
 }
 
-func main() {
+func onMeetingNow(scheduleList ScheduleList) bool {
+	now := time.Now()
+	for _, schedule := range scheduleList.Schedules {
+		start := schedule.StartDateTime
+		end := schedule.EndDateTime
+		summary := schedule.Summary
+		if summary == "" {
+			fmt.Printf("%v-%v is not meeting\n", start, end)
+			continue
+		}
+		if now.After(start) && now.Before(end) {
+			fmt.Printf("%v-%v is meeting!!\n", start, end)
+			return true
+		}
+	}
+	return false
+}
 
+func main() {
 	config, err := getConfig(configPath)
 	if err != nil {
 		log.Fatalf("Failed to get config. err: %v", err)
@@ -109,4 +128,9 @@ func main() {
 	}
 	scheduleList.dump()
 
+	if onMeetingNow(scheduleList) {
+		fmt.Println("I am busy now")
+	} else {
+		fmt.Println("I am free now")
+	}
 }
