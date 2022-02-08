@@ -11,6 +11,8 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
+const configPath = "./.calendar.json"
+
 type config struct {
 	CalendarID string `json:"calendar_id"`
 }
@@ -31,6 +33,7 @@ type scheduleList struct {
 }
 
 func (s *scheduleList) dump() {
+	fmt.Printf("UpdatedAt:%v\n", s.UpdatedAt)
 	for _, schedule := range s.Schedules {
 		fmt.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
 	}
@@ -56,8 +59,6 @@ func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 		return scheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
 	}
 
-	t := time.Now().Format(time.RFC3339)
-	fmt.Printf("Now:%v\n", t)
 	from := time.Now().Format(time.RFC3339)
 	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
 	fmt.Printf("Duration:%v - %v\n", from, to)
@@ -90,11 +91,12 @@ func fetchNextOneDaySchedules(calendarId string) (scheduleList, error) {
 		}
 		scheduleList.Schedules = append(scheduleList.Schedules, s)
 	}
+	scheduleList.UpdatedAt = time.Now()
 	return scheduleList, nil
 }
 
 func main() {
-	const configPath = "./.calendar.json"
+
 	config, err := getConfig(configPath)
 	if err != nil {
 		log.Fatalf("Failed to get config. err: %v", err)
@@ -106,4 +108,5 @@ func main() {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 	}
 	scheduleList.dump()
+
 }
