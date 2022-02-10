@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	configPath = "./.calendar.json"
+	calendarConfigPath = "./.calendar.json"
+	adafruitConfigPath = "./.afafruit.json"
 )
 
 type config struct {
@@ -116,7 +117,7 @@ func onMeetingNow(scheduleList ScheduleList) bool {
 }
 
 func main() {
-	config, err := getConfig(configPath)
+	config, err := getConfig(calendarConfigPath)
 	if err != nil {
 		log.Fatalf("Failed to get config. err: %v", err)
 	}
@@ -133,4 +134,5 @@ func main() {
 	} else {
 		fmt.Println("I am free now")
 	}
+
 }
