@@ -13,14 +13,19 @@ import (
 
 const (
 	calendarConfigPath = "./.calendar.json"
-	adafruitConfigPath = "./.afafruit.json"
+	adafruitConfigPath = "./.adafruit.json"
 )
 
-type config struct {
+type CalendarConfig struct {
 	CalendarID string `json:"calendar_id"`
 }
 
-var defaultConfig = config{
+type AdafruitConfig struct {
+	Username string `json:username`
+	Key      string `json:key`
+}
+
+var defaultConfig = CalendarConfig{
 	CalendarID: "primary",
 }
 
@@ -42,15 +47,28 @@ func (s *ScheduleList) dump() {
 	}
 }
 
-func getConfig(path string) (config, error) {
+func getCalendarConfig(path string) (CalendarConfig, error) {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
-		return config{}, fmt.Errorf("failed to read config file. err: %v", err)
+		return CalendarConfig{}, fmt.Errorf("failed to read config file. err: %v", err)
 	}
-	var c config
+	var c CalendarConfig
 	err = json.Unmarshal(b, &c)
 	if err != nil {
-		return config{}, fmt.Errorf("invalid json file. err: %v", err)
+		return CalendarConfig{}, fmt.Errorf("invalid json file. err: %v", err)
+	}
+	return c, nil
+}
+
+func getAdafruitConfig(path string) (AdafruitConfig, error) {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return AdafruitConfig{}, fmt.Errorf("failed to read config file. err: %v", err)
+	}
+	var c AdafruitConfig
+	err = json.Unmarshal(b, &c)
+	if err != nil {
+		return AdafruitConfig{}, fmt.Errorf("invalid json file. err: %v", err)
 	}
 	return c, nil
 }
@@ -117,13 +135,20 @@ func onMeetingNow(scheduleList ScheduleList) bool {
 }
 
 func main() {
-	config, err := getConfig(calendarConfigPath)
+	calendarConfig, err := getCalendarConfig(calendarConfigPath)
 	if err != nil {
-		log.Fatalf("Failed to get config. err: %v", err)
+		log.Fatalf("Failed to get calendar config. err: %v", err)
 	}
-	fmt.Printf("CalenderId:%s\n", config.CalendarID)
+	fmt.Printf("CalenderId:%s\n", calendarConfig.CalendarID)
 
-	scheduleList, err := fetchNextOneDaySchedules(config.CalendarID)
+	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
+	if err != nil {
+		log.Fatalf("Failed to get adafruit config. err: %v", err)
+	}
+	fmt.Printf("Username:%s\n", adafruitConfig.Username)
+	fmt.Printf("Key:%s\n", adafruitConfig.Key)
+
+	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalendarID)
 	if err != nil {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 	}
