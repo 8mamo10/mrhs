@@ -8,6 +8,7 @@ import (
 	"log"
 	"time"
 
+	aio "github.com/adafruit/io-client-go"
 	"google.golang.org/api/calendar/v3"
 )
 
@@ -160,4 +161,12 @@ func main() {
 		fmt.Println("I am free now")
 	}
 
+	client := aio.NewClient(adafruitConfig.Key)
+	fmt.Printf("client: %v\n", client)
+	feeds, response, err := client.Feed.All()
+	if err != nil {
+		fmt.Println("Failed to get feed")
+	}
+	fmt.Printf("feeds: %v\n", feeds[0].Name)
+	fmt.Printf("response: %v\n", response)
 }

@@ -2,12 +2,16 @@ module github.com/8mamo10/mrhs
 
 go 1.17
 
-require google.golang.org/api v0.66.0
+require (
+	github.com/adafruit/io-client-go v0.0.0-20160613195734-2a7144dc8f4d
+	google.golang.org/api v0.66.0
+)
 
 require (
 	cloud.google.com/go/compute v1.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
