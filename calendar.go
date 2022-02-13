@@ -165,8 +165,11 @@ func main() {
 	fmt.Printf("client: %v\n", client)
 	feeds, response, err := client.Feed.All()
 	if err != nil {
-		fmt.Println("Failed to get feed")
+		fmt.Println("Failed to get all feed")
 	}
 	fmt.Printf("feeds: %v\n", feeds[0].Name)
-	fmt.Printf("response: %v\n", response)
+	response.Debug()
+
+	feed := feeds[0]
+	fmt.Printf("feed: %v\n", feed.LastValue)
 }
