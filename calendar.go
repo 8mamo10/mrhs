@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	aio "github.com/adafruit/io-client-go"
@@ -24,6 +25,7 @@ type CalendarConfig struct {
 type AdafruitConfig struct {
 	Username string `json:username`
 	Key      string `json:key`
+	Feed     string `json:feed`
 }
 
 var defaultConfig = CalendarConfig{
@@ -139,19 +141,23 @@ func main() {
 	calendarConfig, err := getCalendarConfig(calendarConfigPath)
 	if err != nil {
 		log.Fatalf("Failed to get calendar config. err: %v", err)
+		os.Exit(1)
 	}
 	fmt.Printf("CalenderId:%s\n", calendarConfig.CalendarID)
 
 	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
 	if err != nil {
 		log.Fatalf("Failed to get adafruit config. err: %v", err)
+		os.Exit(1)
 	}
 	fmt.Printf("Username:%s\n", adafruitConfig.Username)
 	fmt.Printf("Key:%s\n", adafruitConfig.Key)
+	fmt.Printf("Feed:%s\n", adafruitConfig.Feed)
 
 	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalendarID)
 	if err != nil {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+		os.Exit(1)
 	}
 	scheduleList.dump()
 
@@ -162,14 +168,24 @@ func main() {
 	}
 
 	client := aio.NewClient(adafruitConfig.Key)
-	fmt.Printf("client: %v\n", client)
-	feeds, response, err := client.Feed.All()
+	feed, response, err := client.Feed.Get(adafruitConfig.Feed)
 	if err != nil {
-		fmt.Println("Failed to get all feed")
+		fmt.Printf("Failed to get feed. err: %v\n", err)
+		os.Exit(1)
 	}
-	fmt.Printf("feeds: %v\n", feeds[0].Name)
 	response.Debug()
+	fmt.Printf("Last value of %v: %v\n", feed.Name, feed.LastValue)
+	fmt.Printf("%v\n", feed)
 
-	feed := feeds[0]
-	fmt.Printf("feed: %v\n", feed.LastValue)
+	client.SetFeed(feed)
+	d := aio.Data{Value: "1234"}
+	data, response, err := client.Data.Create(&d)
+	if err != nil {
+		// TODO: Failed to send data. err: json: cannot unmarshal string into Go struct field Data.id of type int
+		fmt.Printf("Failed to send data. err: %v\n", err)
+	} else {
+		fmt.Printf("Updated value of %v: %v\n", feed.Name, data.Value)
+		response.Debug()
+		fmt.Printf("%v\n", feed)
+	}
 }
