@@ -137,6 +137,19 @@ func onMeetingNow(scheduleList ScheduleList) bool {
 	return false
 }
 
+func updateFeed(client *aio.Client, value string) error {
+	d := aio.Data{Value: value}
+	data, response, err := client.Data.Create(&d)
+	if err != nil {
+		// TODO: Failed to send data. err: json: cannot unmarshal string into Go struct field Data.id of type int
+		return fmt.Errorf("failed to send data. err: %v", err)
+	} else {
+		fmt.Printf("Updated value of %v: %v\n", client.Feed.CurrentFeed.Name, data.Value)
+		response.Debug()
+		return nil
+	}
+}
+
 func main() {
 	calendarConfig, err := getCalendarConfig(calendarConfigPath)
 	if err != nil {
@@ -154,19 +167,6 @@ func main() {
 	fmt.Printf("Key:%s\n", adafruitConfig.Key)
 	fmt.Printf("Feed:%s\n", adafruitConfig.Feed)
 
-	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalendarID)
-	if err != nil {
-		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
-		os.Exit(1)
-	}
-	scheduleList.dump()
-
-	if onMeetingNow(scheduleList) {
-		fmt.Println("I am busy now")
-	} else {
-		fmt.Println("I am free now")
-	}
-
 	client := aio.NewClient(adafruitConfig.Key)
 	feed, response, err := client.Feed.Get(adafruitConfig.Feed)
 	if err != nil {
@@ -176,16 +176,20 @@ func main() {
 	response.Debug()
 	fmt.Printf("Last value of %v: %v\n", feed.Name, feed.LastValue)
 	fmt.Printf("%v\n", feed)
-
 	client.SetFeed(feed)
-	d := aio.Data{Value: "1234"}
-	data, response, err := client.Data.Create(&d)
+
+	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalendarID)
 	if err != nil {
-		// TODO: Failed to send data. err: json: cannot unmarshal string into Go struct field Data.id of type int
-		fmt.Printf("Failed to send data. err: %v\n", err)
+		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+		os.Exit(1)
+	}
+	scheduleList.dump()
+
+	if onMeetingNow(scheduleList) {
+		fmt.Println("I am busy now")
+		updateFeed(client, "100")
 	} else {
-		fmt.Printf("Updated value of %v: %v\n", feed.Name, data.Value)
-		response.Debug()
-		fmt.Printf("%v\n", feed)
+		fmt.Println("I am free now")
+		updateFeed(client, "0")
 	}
 }
