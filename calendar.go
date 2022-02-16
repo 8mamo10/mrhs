@@ -21,17 +21,17 @@ const (
 )
 
 type CalendarConfig struct {
-	CalendarID string `json:"calendar_id"`
+	CalenderId string `json:"calendar_id"`
 }
 
 type AdafruitConfig struct {
-	Username string `json:username`
-	Key      string `json:key`
-	Feed     string `json:feed`
+	Username string `json:"username"`
+	Key      string `json:"key"`
+	Feed     string `json:"feed"`
 }
 
 var defaultConfig = CalendarConfig{
-	CalendarID: "primary",
+	CalenderId: "primary",
 }
 
 type Schedule struct {
@@ -158,7 +158,7 @@ func main() {
 		log.Fatalf("Failed to get calendar config. err: %v", err)
 		os.Exit(1)
 	}
-	fmt.Printf("CalenderId:%s\n", calendarConfig.CalendarID)
+	fmt.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
 
 	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
 	if err != nil {
@@ -180,7 +180,7 @@ func main() {
 	fmt.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
-	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalendarID)
+	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
 	if err != nil {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 		os.Exit(1)
