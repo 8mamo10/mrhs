@@ -16,6 +16,8 @@ import (
 const (
 	calendarConfigPath = "./.calendar.json"
 	adafruitConfigPath = "./.adafruit.json"
+	busy               = "100"
+	notBusy            = "0"
 )
 
 type CalendarConfig struct {
@@ -187,9 +189,9 @@ func main() {
 
 	if onMeetingNow(scheduleList) {
 		fmt.Println("I am busy now")
-		updateFeed(client, "100")
+		updateFeed(client, busy)
 	} else {
 		fmt.Println("I am free now")
-		updateFeed(client, "0")
+		updateFeed(client, notBusy)
 	}
 }
