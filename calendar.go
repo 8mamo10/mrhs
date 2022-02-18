@@ -194,4 +194,13 @@ func main() {
 		fmt.Println("I am free now")
 		updateFeed(client, notBusy)
 	}
+
+	ticker := time.NewTicker(time.Second * 2)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			log.Print("Tick")
+		}
+	}
 }
