@@ -187,20 +187,18 @@ func main() {
 	}
 	scheduleList.dump()
 
-	if onMeetingNow(scheduleList) {
-		fmt.Println("I am busy now")
-		updateFeed(client, busy)
-	} else {
-		fmt.Println("I am free now")
-		updateFeed(client, notBusy)
-	}
-
-	ticker := time.NewTicker(time.Second * 2)
+	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			log.Print("Tick")
+			if onMeetingNow(scheduleList) {
+				fmt.Println("I am busy now")
+				updateFeed(client, busy)
+			} else {
+				fmt.Println("I am free now")
+				updateFeed(client, notBusy)
+			}
 		}
 	}
 }
