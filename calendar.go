@@ -78,11 +78,11 @@ func getAdafruitConfig(path string) (AdafruitConfig, error) {
 	return c, nil
 }
 
-func fetchNextOneDaySchedules(calendarId string) (ScheduleList, error) {
+func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
 	ctx := context.Background()
 	srv, err := calendar.NewService(ctx)
 	if err != nil {
-		return ScheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
+		return &ScheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
 	}
 
 	from := time.Now().Format(time.RFC3339)
@@ -92,10 +92,10 @@ func fetchNextOneDaySchedules(calendarId string) (ScheduleList, error) {
 	events, err := srv.Events.List(calendarId).ShowDeleted(false).
 		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
 	if err != nil {
-		return ScheduleList{}, fmt.Errorf("unable to retrieve next events: %v", err)
+		return &ScheduleList{}, fmt.Errorf("unable to retrieve next events: %v", err)
 	}
 	if len(events.Items) == 0 {
-		return ScheduleList{}, fmt.Errorf("no upcoming events found")
+		return &ScheduleList{}, fmt.Errorf("no upcoming events found")
 	}
 
 	scheduleList := ScheduleList{}
@@ -118,10 +118,10 @@ func fetchNextOneDaySchedules(calendarId string) (ScheduleList, error) {
 		scheduleList.Schedules = append(scheduleList.Schedules, s)
 	}
 	scheduleList.UpdatedAt = time.Now()
-	return scheduleList, nil
+	return &scheduleList, nil
 }
 
-func onMeetingNow(scheduleList ScheduleList) bool {
+func onMeetingNow(scheduleList *ScheduleList) bool {
 	now := time.Now()
 	for _, schedule := range scheduleList.Schedules {
 		start := schedule.StartDateTime
@@ -149,6 +149,16 @@ func updateFeed(client *aio.Client, value string) error {
 		fmt.Printf("Updated value of %v: %v\n", client.Feed.CurrentFeed.Name, data.Value)
 		response.Debug()
 		return nil
+	}
+}
+
+func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) {
+	if onMeetingNow(scheduleList) {
+		fmt.Println("I am busy now")
+		updateFeed(client, busy)
+	} else {
+		fmt.Println("I am free now")
+		updateFeed(client, notBusy)
 	}
 }
 
@@ -180,25 +190,19 @@ func main() {
 	fmt.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
-	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
-	if err != nil {
-		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
-		os.Exit(1)
-	}
-	scheduleList.dump()
-
 	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
+
 	for {
 		select {
 		case <-ticker.C:
-			if onMeetingNow(scheduleList) {
-				fmt.Println("I am busy now")
-				updateFeed(client, busy)
-			} else {
-				fmt.Println("I am free now")
-				updateFeed(client, notBusy)
+			scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
+			if err != nil {
+				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+				os.Exit(1)
 			}
+			scheduleList.dump()
+			notifyCurrentStatus(client, scheduleList)
 		}
 	}
 }
