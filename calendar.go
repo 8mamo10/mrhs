@@ -14,10 +14,11 @@ import (
 )
 
 const (
-	calendarConfigPath = "./.calendar.json"
-	adafruitConfigPath = "./.adafruit.json"
-	busy               = "100"
-	notBusy            = "0"
+	calendarConfigPath   = "./.calendar.json"
+	adafruitConfigPath   = "./.adafruit.json"
+	busy                 = "100"
+	notBusy              = "0"
+	sheduleCheckInterval = time.Second * 10
 )
 
 type CalendarConfig struct {
@@ -190,7 +191,7 @@ func main() {
 	fmt.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
-	ticker := time.NewTicker(time.Second * 5)
+	ticker := time.NewTicker(sheduleCheckInterval)
 	defer ticker.Stop()
 
 	for {
