@@ -48,10 +48,12 @@ type ScheduleList struct {
 }
 
 func (s *ScheduleList) dump() {
+	fmt.Println("----------")
 	fmt.Printf("UpdatedAt:%v\n", s.UpdatedAt)
 	for _, schedule := range s.Schedules {
 		fmt.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
 	}
+	fmt.Println("----------")
 }
 
 func getCalendarConfig(path string) (CalendarConfig, error) {
@@ -101,7 +103,6 @@ func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
 	}
 
 	scheduleList := ScheduleList{}
-	fmt.Println("Upcoming events:")
 	for _, item := range events.Items {
 		startDateTime, err := time.Parse(time.RFC3339, item.Start.DateTime)
 		if err != nil {
