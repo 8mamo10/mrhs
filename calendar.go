@@ -18,6 +18,7 @@ const (
 	adafruitConfigPath   = "./.adafruit.json"
 	busy                 = "100"
 	notBusy              = "0"
+	sheduleFetchInterval = time.Minute
 	sheduleCheckInterval = time.Second * 10
 )
 
@@ -191,18 +192,22 @@ func main() {
 	fmt.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
-	ticker := time.NewTicker(sheduleCheckInterval)
-	defer ticker.Stop()
+	fetchTicker := time.NewTicker(sheduleFetchInterval)
+	defer fetchTicker.Stop()
+	checkTicker := time.NewTicker(sheduleCheckInterval)
+	defer checkTicker.Stop()
 
+	scheduleList := &ScheduleList{}
 	for {
 		select {
-		case <-ticker.C:
-			scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
+		case <-fetchTicker.C:
+			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
 			if err != nil {
 				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 				os.Exit(1)
 			}
 			scheduleList.dump()
+		case <-checkTicker.C:
 			notifyCurrentStatus(client, scheduleList)
 		}
 	}
