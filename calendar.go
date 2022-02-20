@@ -197,10 +197,17 @@ func main() {
 	checkTicker := time.NewTicker(sheduleCheckInterval)
 	defer checkTicker.Stop()
 
-	scheduleList := &ScheduleList{}
+	log.Println("Initializing...")
+	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
+	if err != nil {
+		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+		os.Exit(1)
+	}
+
 	for {
 		select {
 		case <-fetchTicker.C:
+			log.Printf("Fetch the latest schedules every %s\n", sheduleFetchInterval)
 			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
 			if err != nil {
 				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
@@ -208,6 +215,7 @@ func main() {
 			}
 			scheduleList.dump()
 		case <-checkTicker.C:
+			log.Printf("Check the current status every %s\n", sheduleCheckInterval)
 			notifyCurrentStatus(client, scheduleList)
 		}
 	}
