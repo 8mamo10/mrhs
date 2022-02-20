@@ -14,12 +14,12 @@ import (
 )
 
 const (
-	calendarConfigPath   = "./.calendar.json"
-	adafruitConfigPath   = "./.adafruit.json"
-	busy                 = "100"
-	notBusy              = "0"
-	sheduleFetchInterval = time.Minute
-	sheduleCheckInterval = time.Second * 10
+	calendarConfigPath    = "./.calendar.json"
+	adafruitConfigPath    = "./.adafruit.json"
+	busy                  = "100"
+	notBusy               = "0"
+	scheduleFetchInterval = time.Minute
+	scheduleCheckInterval = time.Second * 10
 )
 
 type CalendarConfig struct {
@@ -192,9 +192,9 @@ func main() {
 	fmt.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
-	fetchTicker := time.NewTicker(sheduleFetchInterval)
+	fetchTicker := time.NewTicker(scheduleFetchInterval)
 	defer fetchTicker.Stop()
-	checkTicker := time.NewTicker(sheduleCheckInterval)
+	checkTicker := time.NewTicker(scheduleCheckInterval)
 	defer checkTicker.Stop()
 
 	log.Println("Initializing...")
@@ -207,7 +207,7 @@ func main() {
 	for {
 		select {
 		case <-fetchTicker.C:
-			log.Printf("Fetch the latest schedules every %s\n", sheduleFetchInterval)
+			log.Printf("Fetch the latest schedules every %s\n", scheduleFetchInterval)
 			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
 			if err != nil {
 				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
@@ -215,7 +215,7 @@ func main() {
 			}
 			scheduleList.dump()
 		case <-checkTicker.C:
-			log.Printf("Check the current status every %s\n", sheduleCheckInterval)
+			log.Printf("Check the current status every %s\n", scheduleCheckInterval)
 			notifyCurrentStatus(client, scheduleList)
 		}
 	}
