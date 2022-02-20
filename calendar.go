@@ -210,6 +210,7 @@ func main() {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 		os.Exit(1)
 	}
+	scheduleList.dump()
 
 	for {
 		select {
