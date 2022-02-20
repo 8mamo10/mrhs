@@ -18,8 +18,8 @@ const (
 	adafruitConfigPath    = "./.adafruit.json"
 	busy                  = "100"
 	notBusy               = "0"
-	scheduleFetchInterval = time.Minute
-	scheduleCheckInterval = time.Second * 10
+	scheduleFetchInterval = time.Minute * 30
+	scheduleCheckInterval = time.Minute * 10
 )
 
 type CalendarConfig struct {
