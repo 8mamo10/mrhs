@@ -146,7 +146,8 @@ func updateFeed(client *aio.Client, value string) error {
 	data, response, err := client.Data.Create(&d)
 	if err != nil {
 		// TODO: Failed to send data. err: json: cannot unmarshal string into Go struct field Data.id of type int
-		return fmt.Errorf("failed to send data. err: %v", err)
+		// return fmt.Errorf("failed to send data. err: %v", err)
+		return nil
 	} else {
 		fmt.Printf("Updated value of %v: %v\n", client.Feed.CurrentFeed.Name, data.Value)
 		response.Debug()
@@ -154,14 +155,19 @@ func updateFeed(client *aio.Client, value string) error {
 	}
 }
 
-func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) {
+func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
+	var err error
 	if onMeetingNow(scheduleList) {
 		fmt.Println("I am busy now")
-		updateFeed(client, busy)
+		err = updateFeed(client, busy)
 	} else {
 		fmt.Println("I am free now")
-		updateFeed(client, notBusy)
+		err = updateFeed(client, notBusy)
 	}
+	if err != nil {
+		return fmt.Errorf("failed to update feed. err: %v", err)
+	}
+	return nil
 }
 
 func main() {
@@ -211,12 +217,14 @@ func main() {
 			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
 			if err != nil {
 				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
-				os.Exit(1)
 			}
 			scheduleList.dump()
 		case <-checkTicker.C:
 			log.Printf("Check the current status every %s\n", scheduleCheckInterval)
-			notifyCurrentStatus(client, scheduleList)
+			err := notifyCurrentStatus(client, scheduleList)
+			if err != nil {
+				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+			}
 		}
 	}
 }
