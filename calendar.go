@@ -131,7 +131,7 @@ func onMeetingNow(scheduleList *ScheduleList) bool {
 		end := schedule.EndDateTime
 		summary := schedule.Summary
 		if summary == "" {
-			fmt.Printf("%v-%v is not meeting\n", start, end)
+			//fmt.Printf("%v-%v is not meeting\n", start, end)
 			continue
 		}
 		if now.After(start) && now.Before(end) {
