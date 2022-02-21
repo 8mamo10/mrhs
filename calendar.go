@@ -159,10 +159,10 @@ func updateFeed(client *aio.Client, value string) error {
 func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 	var err error
 	if onMeetingNow(scheduleList) {
-		fmt.Println("I am busy now")
+		fmt.Printf("%s: I am busy now\n", time.Now())
 		err = updateFeed(client, busy)
 	} else {
-		fmt.Println("I am free now")
+		fmt.Printf("%s: I am free now\n", time.Now())
 		err = updateFeed(client, notBusy)
 	}
 	if err != nil {
