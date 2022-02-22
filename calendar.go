@@ -48,12 +48,12 @@ type ScheduleList struct {
 }
 
 func (s *ScheduleList) dump() {
-	fmt.Println("----------")
-	fmt.Printf("UpdatedAt:%v\n", s.UpdatedAt)
+	log.Println("----------")
+	log.Printf("UpdatedAt:%v\n", s.UpdatedAt)
 	for _, schedule := range s.Schedules {
-		fmt.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
+		log.Printf("%v,%v,%v\n", schedule.StartDateTime, schedule.EndDateTime, schedule.Summary)
 	}
-	fmt.Println("----------")
+	log.Println("----------")
 }
 
 func getCalendarConfig(path string) (CalendarConfig, error) {
@@ -91,7 +91,7 @@ func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
 
 	from := time.Now().Format(time.RFC3339)
 	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
-	fmt.Printf("Duration:%v - %v\n", from, to)
+	log.Printf("Duration:%v - %v\n", from, to)
 
 	events, err := srv.Events.List(calendarId).ShowDeleted(false).
 		SingleEvents(true).TimeMin(from).TimeMax(to).OrderBy("startTime").Do()
@@ -131,11 +131,11 @@ func onMeetingNow(scheduleList *ScheduleList) bool {
 		end := schedule.EndDateTime
 		summary := schedule.Summary
 		if summary == "" {
-			//fmt.Printf("%v-%v is not meeting\n", start, end)
+			//log.Printf("%v-%v is not meeting\n", start, end)
 			continue
 		}
 		if now.After(start) && now.Before(end) {
-			fmt.Printf("%v-%v is meeting!!\n", start, end)
+			log.Printf("%v-%v is meeting!!\n", start, end)
 			return true
 		}
 	}
@@ -150,7 +150,7 @@ func updateFeed(client *aio.Client, value string) error {
 		// return fmt.Errorf("failed to send data. err: %v", err)
 		return nil
 	} else {
-		fmt.Printf("Updated value of %v: %v\n", client.Feed.CurrentFeed.Name, data.Value)
+		log.Printf("Updated value of %v: %v\n", client.Feed.CurrentFeed.Name, data.Value)
 		response.Debug()
 		return nil
 	}
@@ -159,10 +159,10 @@ func updateFeed(client *aio.Client, value string) error {
 func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 	var err error
 	if onMeetingNow(scheduleList) {
-		fmt.Printf("%s: I am busy now\n", time.Now())
+		log.Println("I am busy now")
 		err = updateFeed(client, busy)
 	} else {
-		fmt.Printf("%s: I am free now\n", time.Now())
+		log.Println("I am free now")
 		err = updateFeed(client, notBusy)
 	}
 	if err != nil {
@@ -177,26 +177,26 @@ func main() {
 		log.Fatalf("Failed to get calendar config. err: %v", err)
 		os.Exit(1)
 	}
-	fmt.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
+	log.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
 
 	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
 	if err != nil {
 		log.Fatalf("Failed to get adafruit config. err: %v", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Username:%s\n", adafruitConfig.Username)
-	fmt.Printf("Key:%s\n", adafruitConfig.Key)
-	fmt.Printf("Feed:%s\n", adafruitConfig.Feed)
+	log.Printf("Username:%s\n", adafruitConfig.Username)
+	log.Printf("Key:%s\n", adafruitConfig.Key)
+	log.Printf("Feed:%s\n", adafruitConfig.Feed)
 
 	client := aio.NewClient(adafruitConfig.Key)
 	feed, response, err := client.Feed.Get(adafruitConfig.Feed)
 	if err != nil {
-		fmt.Printf("Failed to get feed. err: %v\n", err)
+		log.Printf("Failed to get feed. err: %v\n", err)
 		os.Exit(1)
 	}
 	response.Debug()
-	fmt.Printf("Last value of %v: %v\n", feed.Name, feed.LastValue)
-	fmt.Printf("%v\n", feed)
+	log.Printf("Last value of %v: %v\n", feed.Name, feed.LastValue)
+	log.Printf("%v\n", feed)
 	client.SetFeed(feed)
 
 	fetchTicker := time.NewTicker(scheduleFetchInterval)
