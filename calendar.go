@@ -205,12 +205,18 @@ func main() {
 	defer checkTicker.Stop()
 
 	log.Println("Initializing...")
+
 	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
 	if err != nil {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
 		os.Exit(1)
 	}
 	scheduleList.dump()
+	err = notifyCurrentStatus(client, scheduleList)
+	if err != nil {
+		log.Fatalf("Failed to notify current status. err: %v", err)
+		os.Exit(1)
+	}
 
 	for {
 		select {
@@ -225,7 +231,7 @@ func main() {
 			log.Printf("Check the current status every %s\n", scheduleCheckInterval)
 			err := notifyCurrentStatus(client, scheduleList)
 			if err != nil {
-				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+				log.Fatalf("Failed to notify current status. err: %v", err)
 			}
 		}
 	}
