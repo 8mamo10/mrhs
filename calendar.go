@@ -204,8 +204,6 @@ func main() {
 	checkTicker := time.NewTicker(scheduleCheckInterval)
 	defer checkTicker.Stop()
 
-	log.Println("Initializing...")
-
 	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
 	if err != nil {
 		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
