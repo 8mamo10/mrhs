@@ -11,11 +11,13 @@ import (
 
 	aio "github.com/adafruit/io-client-go"
 	"google.golang.org/api/calendar/v3"
+	"google.golang.org/api/option"
 )
 
 const (
 	calendarConfigPath    = "./.calendar.json"
 	adafruitConfigPath    = "./.adafruit.json"
+	credentialPath        = "./.credential.json"
 	busy                  = "100"
 	notBusy               = "0"
 	scheduleFetchInterval = time.Minute * 15
@@ -84,7 +86,9 @@ func getAdafruitConfig(path string) (AdafruitConfig, error) {
 
 func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
 	ctx := context.Background()
-	srv, err := calendar.NewService(ctx)
+	srv, err := calendar.NewService(ctx, option.WithCredentialsFile(credentialPath))
+	// Use this if passing the credentials via environment variables
+	//srv, err := calendar.NewService(ctx)
 	if err != nil {
 		return &ScheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
 	}
