@@ -178,14 +178,14 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 func main() {
 	calendarConfig, err := getCalendarConfig(calendarConfigPath)
 	if err != nil {
-		log.Fatalf("Failed to get calendar config. err: %v", err)
+		log.Printf("Failed to get calendar config. err: %v", err)
 		os.Exit(1)
 	}
 	log.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
 
 	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
 	if err != nil {
-		log.Fatalf("Failed to get adafruit config. err: %v", err)
+		log.Printf("Failed to get adafruit config. err: %v", err)
 		os.Exit(1)
 	}
 	log.Printf("Username:%s\n", adafruitConfig.Username)
@@ -210,13 +210,13 @@ func main() {
 
 	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
 	if err != nil {
-		log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+		log.Printf("Failed to fetch next one day schedules. err: %v", err)
 		os.Exit(1)
 	}
 	scheduleList.dump()
 	err = notifyCurrentStatus(client, scheduleList)
 	if err != nil {
-		log.Fatalf("Failed to notify current status. err: %v", err)
+		log.Printf("Failed to notify current status. err: %v", err)
 		os.Exit(1)
 	}
 
@@ -226,14 +226,14 @@ func main() {
 			log.Printf("Fetch the latest schedules every %s\n", scheduleFetchInterval)
 			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
 			if err != nil {
-				log.Fatalf("Failed to fetch next one day schedules. err: %v", err)
+				log.Printf("Failed to fetch next one day schedules. err: %v", err)
 			}
 			scheduleList.dump()
 		case <-checkTicker.C:
 			log.Printf("Check the current status every %s\n", scheduleCheckInterval)
 			err := notifyCurrentStatus(client, scheduleList)
 			if err != nil {
-				log.Fatalf("Failed to notify current status. err: %v", err)
+				log.Printf("Failed to notify current status. err: %v", err)
 			}
 		}
 	}
