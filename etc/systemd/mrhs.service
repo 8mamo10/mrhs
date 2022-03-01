@@ -1,0 +1,10 @@
+[Unit]
+Description=mrhs
+
+[Service]
+Type=simple
+ExecStart=/home/pi/mrhs
+Restart=always
+
+[Install]
+WantedBy = multi-user.target
