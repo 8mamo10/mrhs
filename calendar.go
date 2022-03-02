@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	calendarConfigPath    = "./.calendar.json"
-	adafruitConfigPath    = "./.adafruit.json"
-	credentialPath        = "./.credential.json"
+	calendarConfigPath    = "/home/pi/git/mrhs/.calendar.json"
+	adafruitConfigPath    = "/home/pi/git/mrhs/.adafruit.json"
+	credentialPath        = "/home/pi/git/mrhs/.credential.json"
 	busy                  = "100"
 	notBusy               = "0"
 	scheduleFetchInterval = time.Minute * 15
