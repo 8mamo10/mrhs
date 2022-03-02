@@ -1,10 +1,10 @@
 [Unit]
-Description=mrhs
+Description=mrhs service
 
 [Service]
 Type=simple
-ExecStart=/home/pi/mrhs
+ExecStart=/home/pi/git/mrhs/mrhsagent
 Restart=always
 
 [Install]
-WantedBy = multi-user.target
+WantedBy=multi-user.target
