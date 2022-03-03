@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	calendarConfigPath    = "/home/pi/git/mrhs/.calendar.json"
-	adafruitConfigPath    = "/home/pi/git/mrhs/.adafruit.json"
-	credentialPath        = "/home/pi/git/mrhs/.credential.json"
-	busy                  = "100"
-	notBusy               = "0"
-	scheduleFetchInterval = time.Minute * 15
-	scheduleCheckInterval = time.Minute * 1
+	defaultCalendarConfigPath = "/home/pi/git/mrhs/.calendar.json"
+	defaultAdafruitConfigPath = "/home/pi/git/mrhs/.adafruit.json"
+	defaultCredentialPath     = "/home/pi/git/mrhs/.credential.json"
+	busy                      = "100"
+	notBusy                   = "0"
+	scheduleFetchInterval     = time.Minute * 15
+	scheduleCheckInterval     = time.Minute * 1
 )
 
 type CalendarConfig struct {
@@ -86,7 +86,7 @@ func getAdafruitConfig(path string) (AdafruitConfig, error) {
 
 func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
 	ctx := context.Background()
-	srv, err := calendar.NewService(ctx, option.WithCredentialsFile(credentialPath))
+	srv, err := calendar.NewService(ctx, option.WithCredentialsFile(defaultCredentialPath))
 	// Use this if passing the credentials via environment variables
 	//srv, err := calendar.NewService(ctx)
 	if err != nil {
@@ -176,14 +176,14 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 }
 
 func main() {
-	calendarConfig, err := getCalendarConfig(calendarConfigPath)
+	calendarConfig, err := getCalendarConfig(defaultCalendarConfigPath)
 	if err != nil {
 		log.Printf("Failed to get calendar config. err: %v", err)
 		os.Exit(1)
 	}
 	log.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
 
-	adafruitConfig, err := getAdafruitConfig(adafruitConfigPath)
+	adafruitConfig, err := getAdafruitConfig(defaultAdafruitConfigPath)
 	if err != nil {
 		log.Printf("Failed to get adafruit config. err: %v", err)
 		os.Exit(1)
