@@ -1,8 +1,10 @@
 # mrhs
+
 - Monitoring Running Hangout Status
 - M5Stack + MQTT
 
 ## MQTT broker
+
 - Using io.adafruit this time.
 - Sign up to https://io.adafruit.com/
 - Create Feeds `mrhs`
@@ -11,6 +13,7 @@
   - https://io.adafruit.com/[Username]/dashboards/mrhs
 
 ## MQTT client
+
 - Using MQTT.fx
   - http://mqttfx.jensd.de/
 - Download and install it
@@ -38,15 +41,19 @@
   - Push `Subscribe`
 
 ## M5Stack
+
 - https://github.com/8mamo10/m5stack
 
 ## Adafruit_MQTT
+
 - Sketch -> Include Library -> Manage Libraries
   - Adafruit MQTT Library (vresion was 1.3.0 when I did)
 
 ## mosquitto
+
 - https://mosquitto.org/
 - `brew install mosquitto`
+
 ```
 $ /usr/local/sbin/mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
 1600654250: mosquitto version 1.6.12 starting
@@ -93,6 +100,7 @@ $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${use
 ```
 
 ## MRHS agent
+
 - Update `username` and `key` on `script/.mrhs.json`
 - Set up cron at an appropriate frequency
 
@@ -105,6 +113,7 @@ $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${use
 ```
 
 ## References
+
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
 - https://io.adafruit.com/api/docs/mqtt.html#adafruit-io-mqtt-api
