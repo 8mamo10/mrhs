@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -176,6 +177,10 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 }
 
 func main() {
+	f := flag.String("cconf", defaultCalendarConfigPath, "path to .calender.json")
+	flag.Parse()
+	log.Printf("flag: %v\n", f)
+
 	calendarConfig, err := getCalendarConfig(defaultCalendarConfigPath)
 	if err != nil {
 		log.Printf("Failed to get calendar config. err: %v", err)
