@@ -181,11 +181,10 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 }
 
 func main() {
-	f := flag.String("cconf", defaultCalendarConfigPath, fmt.Sprintf("path to %s", calendarConfigFileName))
+	calendarConfigPath := flag.String("cconf", defaultCalendarConfigPath, fmt.Sprintf("path to %s", calendarConfigFileName))
 	flag.Parse()
-	log.Printf("flag: %v\n", f)
 
-	calendarConfig, err := getCalendarConfig(defaultCalendarConfigPath)
+	calendarConfig, err := getCalendarConfig(*calendarConfigPath)
 	if err != nil {
 		log.Printf("Failed to get calendar config. err: %v", err)
 		os.Exit(1)
