@@ -181,7 +181,7 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 }
 
 func main() {
-	f := flag.String("cconf", defaultCalendarConfigPath, "path to .calender.json")
+	f := flag.String("cconf", defaultCalendarConfigPath, fmt.Sprintf("path to %s", calendarConfigFileName))
 	flag.Parse()
 	log.Printf("flag: %v\n", f)
 
