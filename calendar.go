@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	configPath                = "./"
+	configPath                = "/etc/mrhs/"
 	calendarConfigFileName    = ".calendar.json"
 	adafruitConfigFileName    = ".adafruit.json"
 	credentialFileName        = ".credential.json"
@@ -89,14 +89,7 @@ func getAdafruitConfig(path string) (AdafruitConfig, error) {
 	return c, nil
 }
 
-func fetchNextOneDaySchedules(calendarId string) (*ScheduleList, error) {
-	ctx := context.Background()
-	srv, err := calendar.NewService(ctx, option.WithCredentialsFile(defaultCredentialPath))
-	// Use this if passing the credentials via environment variables
-	//srv, err := calendar.NewService(ctx)
-	if err != nil {
-		return &ScheduleList{}, fmt.Errorf("unable to retrieve calendar client. err: %v", err)
-	}
+func fetchNextOneDaySchedules(srv *calendar.Service, calendarId string) (*ScheduleList, error) {
 
 	from := time.Now().Format(time.RFC3339)
 	to := time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
@@ -182,6 +175,8 @@ func notifyCurrentStatus(client *aio.Client, scheduleList *ScheduleList) error {
 
 func main() {
 	calendarConfigPath := flag.String("cconf", defaultCalendarConfigPath, fmt.Sprintf("path to %s", calendarConfigFileName))
+	adafruitConfigPath := flag.String("aconf", defaultAdafruitConfigPath, fmt.Sprintf("path to %s", adafruitConfigFileName))
+	credentialPath := flag.String("c", defaultCredentialPath, fmt.Sprintf("path to %s", credentialFileName))
 	flag.Parse()
 
 	calendarConfig, err := getCalendarConfig(*calendarConfigPath)
@@ -191,7 +186,7 @@ func main() {
 	}
 	log.Printf("CalenderId:%s\n", calendarConfig.CalenderId)
 
-	adafruitConfig, err := getAdafruitConfig(defaultAdafruitConfigPath)
+	adafruitConfig, err := getAdafruitConfig(*adafruitConfigPath)
 	if err != nil {
 		log.Printf("Failed to get adafruit config. err: %v", err)
 		os.Exit(1)
@@ -199,6 +194,13 @@ func main() {
 	log.Printf("Username:%s\n", adafruitConfig.Username)
 	log.Printf("Key:%s\n", adafruitConfig.Key)
 	log.Printf("Feed:%s\n", adafruitConfig.Feed)
+
+	ctx := context.Background()
+	srv, err := calendar.NewService(ctx, option.WithCredentialsFile(*credentialPath))
+	if err != nil {
+		log.Printf("Failed to get credential. err: %v", err)
+		os.Exit(1)
+	}
 
 	client := aio.NewClient(adafruitConfig.Key)
 	feed, response, err := client.Feed.Get(adafruitConfig.Feed)
@@ -216,7 +218,7 @@ func main() {
 	checkTicker := time.NewTicker(scheduleCheckInterval)
 	defer checkTicker.Stop()
 
-	scheduleList, err := fetchNextOneDaySchedules(calendarConfig.CalenderId)
+	scheduleList, err := fetchNextOneDaySchedules(srv, calendarConfig.CalenderId)
 	if err != nil {
 		log.Printf("Failed to fetch next one day schedules. err: %v", err)
 		os.Exit(1)
@@ -232,7 +234,7 @@ func main() {
 		select {
 		case <-fetchTicker.C:
 			log.Printf("Fetch the latest schedules every %s\n", scheduleFetchInterval)
-			scheduleList, err = fetchNextOneDaySchedules(calendarConfig.CalenderId)
+			scheduleList, err = fetchNextOneDaySchedules(srv, calendarConfig.CalenderId)
 			if err != nil {
 				log.Printf("Failed to fetch next one day schedules. err: %v", err)
 			}
