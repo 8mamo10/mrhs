@@ -18,10 +18,10 @@ import (
 const (
 	configPath                = "./"
 	calendarConfigFileName    = ".calendar.json"
-	defaultCalendarConfigPath = configPath + calendarConfigFileName
 	adafruitConfigFileName    = ".adafruit.json"
-	defaultAdafruitConfigPath = configPath + adafruitConfigFileName
 	credentialFileName        = ".credential.json"
+	defaultCalendarConfigPath = configPath + calendarConfigFileName
+	defaultAdafruitConfigPath = configPath + adafruitConfigFileName
 	defaultCredentialPath     = configPath + credentialFileName
 	busy                      = "100"
 	notBusy                   = "0"
