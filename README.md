@@ -112,6 +112,18 @@ $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${use
 */5 * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
 ```
 
+## deploy
+
+```
+$ go build -o path/to/mrhsagent
+$ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
+$ sudo ln -s path/to/mrhs.service /lib/systemd/system/mrhs.service
+$ sudo ln -s path/to/.calendar.json /etc/mrhs/.calendar.json
+$ sudo ln -s path/to/.adafruit.json /etc/mrhs/.adafruit.json
+$ sudo ln -s path/to/.credential.json /etc/mrhs/.credential.json
+$ sudo systemctl restart mrhs.service
+```
+
 ## References
 
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
