@@ -3,11 +3,11 @@
 - Monitoring Running Hangout Status
 - M5Stack + MQTT
 
-## Deploy
+## Deploy MRHS agent
 
 ```
 $ cd agent
-$ go build -o path/to/mrhsagent
+$ go build -o path/to/mrhsagent mrhs.go
 $ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
 $ sudo ln -s path/to/mrhs.service /lib/systemd/system/mrhs.service
 $ sudo ln -s path/to/.calendar.json /etc/mrhs/.calendar.json
