@@ -3,7 +3,35 @@
 - Monitoring Running Hangout Status
 - M5Stack + MQTT
 
-## MQTT broker
+## Deploy
+
+```
+$ cd agent
+$ go build -o path/to/mrhsagent
+$ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
+$ sudo ln -s path/to/mrhs.service /lib/systemd/system/mrhs.service
+$ sudo ln -s path/to/.calendar.json /etc/mrhs/.calendar.json
+$ sudo ln -s path/to/.adafruit.json /etc/mrhs/.adafruit.json
+$ sudo ln -s path/to/.credential.json /etc/mrhs/.credential.json
+$ sudo systemctl restart mrhs.service
+```
+
+## MRHS cli(deprecated)
+
+- Update `username` and `key` on `script/.mrhs.json`
+- Set up cron at an appropriate frequency
+
+```
+# Every minute
+*   * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
+
+# Every 5minutes
+*/5 * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
+```
+
+## Notes
+
+### MQTT broker
 
 - Using io.adafruit this time.
 - Sign up to https://io.adafruit.com/
@@ -12,7 +40,7 @@
 - Create Dashboard `mrhs`
   - https://io.adafruit.com/[Username]/dashboards/mrhs
 
-## MQTT client
+### MQTT client
 
 - Using MQTT.fx
   - http://mqttfx.jensd.de/
@@ -40,16 +68,16 @@
   - Input topic: `[Username]/feeds/mrhs`
   - Push `Subscribe`
 
-## M5Stack
+### M5Stack
 
 - https://github.com/8mamo10/m5stack
 
-## Adafruit_MQTT
+### Adafruit_MQTT
 
 - Sketch -> Include Library -> Manage Libraries
   - Adafruit MQTT Library (vresion was 1.3.0 when I did)
 
-## mosquitto
+### mosquitto
 
 - https://mosquitto.org/
 - `brew install mosquitto`
@@ -99,32 +127,7 @@ $ mosquitto_pub -L mqtt://${username}:${key}@io.adafruit.com/${username}/feeds/m
 $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${username} -P ${key} --tls-version tlsv1.2 --cafile /etc/ssl/cert.pem
 ```
 
-## MRHS cli
-
-- Update `username` and `key` on `script/.mrhs.json`
-- Set up cron at an appropriate frequency
-
-```
-# Every minute
-*   * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
-
-# Every 5minutes
-*/5 * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
-```
-
-## deploy
-
-```
-$ go build -o path/to/mrhsagent
-$ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
-$ sudo ln -s path/to/mrhs.service /lib/systemd/system/mrhs.service
-$ sudo ln -s path/to/.calendar.json /etc/mrhs/.calendar.json
-$ sudo ln -s path/to/.adafruit.json /etc/mrhs/.adafruit.json
-$ sudo ln -s path/to/.credential.json /etc/mrhs/.credential.json
-$ sudo systemctl restart mrhs.service
-```
-
-## References
+### References
 
 - https://learn.adafruit.com/naming-things-in-adafruit-io/naming-and-accessing-feeds-with-the-mqtt-api
 - https://learn.adafruit.com/mqtt-adafruit-io-and-you/overview
