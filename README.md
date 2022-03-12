@@ -99,17 +99,17 @@ $ mosquitto_pub -L mqtt://${username}:${key}@io.adafruit.com/${username}/feeds/m
 $ mosquitto_sub -d -h io.adafruit.com -p 8883 -t ${username}/feeds/mrhs -u ${username} -P ${key} --tls-version tlsv1.2 --cafile /etc/ssl/cert.pem
 ```
 
-## MRHS agent
+## MRHS cli
 
 - Update `username` and `key` on `script/.mrhs.json`
 - Set up cron at an appropriate frequency
 
 ```
 # Every minute
-*   * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
+*   * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
 
 # Every 5minutes
-*/5 * * * * ${path/to/mrhs_agent}/mrhs_agent.sh
+*/5 * * * * ${path/to/mrhs_agent}/mrhs_cli.sh
 ```
 
 ## deploy
