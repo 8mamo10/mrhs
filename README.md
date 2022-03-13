@@ -5,6 +5,8 @@
 
 ## mrhs agent
 
+- deploy
+
 ```
 $ go build -o path/to/mrhsagent agent.go
 $ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
@@ -14,6 +16,31 @@ $ sudo ln -s path/to/.adafruit.json /etc/mrhs/.adafruit.json
 $ sudo ln -s path/to/.credential.json /etc/mrhs/.credential.json
 $ sudo systemctl restart mrhs.service
 ```
+
+- .calendar.json
+  - set calendar id to be monitored
+
+```
+$ cat .calendar.json
+{
+  "calendar_id": "mrhs@example.com"
+}
+```
+
+- .adafruilt.json
+  - set information to use Adafruit IO
+
+```
+$ cat .adafruit.json
+{
+  "username": "xxx",
+  "key": "yyy"
+  "feed": "zzz"
+}
+```
+
+- .credential.json
+  - put a file to be served for google service account
 
 ## mrhs client
 
