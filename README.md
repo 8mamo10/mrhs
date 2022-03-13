@@ -6,7 +6,6 @@
 ## mrhs agent
 
 ```
-$ cd agent
 $ go build -o path/to/mrhsagent agent.go
 $ sudo ln -s path/to/mrhsagent /usr/local/bin/mrhsagent
 $ sudo ln -s path/to/mrhs.service /lib/systemd/system/mrhs.service
