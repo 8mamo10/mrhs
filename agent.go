@@ -17,9 +17,9 @@ import (
 
 const (
 	configPath                = "/etc/mrhs/"
-	calendarConfigFileName    = ".calendar.json"
-	adafruitConfigFileName    = ".adafruit.json"
-	credentialFileName        = ".credential.json"
+	calendarConfigFileName    = "calendar.json"
+	adafruitConfigFileName    = "adafruit.json"
+	credentialFileName        = "credential.json"
 	defaultCalendarConfigPath = configPath + calendarConfigFileName
 	defaultAdafruitConfigPath = configPath + adafruitConfigFileName
 	defaultCredentialPath     = configPath + credentialFileName
