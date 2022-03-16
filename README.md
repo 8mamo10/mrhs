@@ -34,7 +34,7 @@ $ cat calendar.json
 $ cat adafruit.json
 {
   "username": "xxx",
-  "key": "yyy"
+  "key": "yyy",
   "feed": "zzz"
 }
 ```
