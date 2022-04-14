@@ -67,24 +67,24 @@ void SetupWifi(const char *file)
   M5.Lcd.printf("PASS:%s\n", pass);
   M5.Lcd.println("Connecting...");
 
-  //Serial.printf("SSID:%s\n", ssid);
-  //Serial.printf("PASS:%s\n", pass);
-  //Serial.printf("USERNAME:%s\n", username);
-  //Serial.printf("KEY:%s\n", key);
+  // Serial.printf("SSID:%s\n", ssid);
+  // Serial.printf("PASS:%s\n", pass);
+  // Serial.printf("USERNAME:%s\n", username);
+  // Serial.printf("KEY:%s\n", key);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    //Serial.print(".");
+    // Serial.print(".");
   }
-  //Serial.print("\n");
+  // Serial.print("\n");
 
   M5.Lcd.print("IP: ");
   M5.Lcd.println(WiFi.localIP());
-  //Serial.printf("IP: ");
-  //Serial.println(WiFi.localIP());
+  // Serial.printf("IP: ");
+  // Serial.println(WiFi.localIP());
   fp.close();
 
   debugMsg += "SSID:";
@@ -170,8 +170,8 @@ void showNg()
   {
     M5.Lcd.fillScreen(TFT_RED);
     // 320 * 240
-    //M5.Lcd.fillRect(60, 110, 200, 20, TFT_WHITE);
-    //M5.Lcd.fillRect(150, 20, 20, 200, TFT_WHITE);
+    // M5.Lcd.fillRect(60, 110, 200, 20, TFT_WHITE);
+    // M5.Lcd.fillRect(150, 20, 20, 200, TFT_WHITE);
     for (int i = 0; i <= 10; i++)
     {
       M5.Lcd.drawLine(60 + i, 20 - i, 260 + i, 220 - i, TFT_WHITE);
@@ -211,7 +211,7 @@ void MQTT_connect()
 
 void setup()
 {
-  Serial.begin(115200);
+  // Serial.begin(115200);
   M5.begin();
   M5.Lcd.clear(BLACK);
   M5.Lcd.setTextColor(WHITE);
